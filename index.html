@@ -1,0 +1,171 @@
+# Score-Tracker
+Tracks Your Score 
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Legend Sports App</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #0a0a0a;
+      color: white;
+      text-align: center;
+    }
+
+    h1 {
+      color: red;
+      text-shadow: 0 0 20px red;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .active {
+      display: block;
+    }
+
+    .card {
+      margin: 20px auto;
+      padding: 20px;
+      width: 350px;
+      border-radius: 15px;
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 0 20px red;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 10px;
+      border: none;
+    }
+
+    button {
+      background: red;
+      color: white;
+      cursor: pointer;
+    }
+
+    .score {
+      font-size: 30px;
+      color: cyan;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🏆 LEGEND SPORTS APP</h1>
+
+<!-- LOGIN SCREEN -->
+<div id="login" class="screen active card">
+  <h2>Login</h2>
+  <input id="username" placeholder="Enter Name"><br>
+  <button onclick="login()">Enter</button>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="screen">
+
+<div class="card">
+  <input id="teamA" placeholder="Team A">
+  <input id="teamB" placeholder="Team B">
+
+  <div class="score" id="score">0 - 0</div>
+
+  <button onclick="addA()">A +</button>
+  <button onclick="addB()">B +</button>
+  <button onclick="reset()">Reset</button>
+  <button onclick="save()">Save Match</button>
+
+  <canvas id="chart" width="300" height="200"></canvas>
+</div>
+
+<div class="card">
+  <h3>🏆 Leaderboard</h3>
+  <ul id="leaderboard"></ul>
+</div>
+
+</div>
+
+<script>
+let a=0,b=0;
+
+function login(){
+  let user=document.getElementById("username").value;
+  if(user){
+    localStorage.setItem("user",user);
+    document.getElementById("login").classList.remove("active");
+    document.getElementById("app").classList.add("active");
+  }
+}
+
+// Chart
+let ctx=document.getElementById("chart").getContext("2d");
+let chart=new Chart(ctx,{
+  type:"line",
+  data:{
+    labels:[],
+    datasets:[
+      {label:"A", data:[], borderColor:"red"},
+      {label:"B", data:[], borderColor:"cyan"}
+    ]
+  }
+});
+
+function update(){
+  document.getElementById("score").innerText=a+" - "+b;
+
+  chart.data.labels.push("");
+  chart.data.datasets[0].data.push(a);
+  chart.data.datasets[1].data.push(b);
+  chart.update();
+}
+
+function addA(){ a++; update(); }
+function addB(){ b++; update(); }
+
+function reset(){
+  a=0;b=0;
+  chart.data.labels=[];
+  chart.data.datasets[0].data=[];
+  chart.data.datasets[1].data=[];
+  chart.update();
+  update();
+}
+
+function save(){
+  let tA=document.getElementById("teamA").value||"A";
+  let tB=document.getElementById("teamB").value||"B";
+
+  let match=tA+" "+a+" - "+b+" "+tB;
+
+  let data=JSON.parse(localStorage.getItem("leaderboard")||"[]");
+  data.push(match);
+  localStorage.setItem("leaderboard",JSON.stringify(data));
+
+  loadLeaderboard();
+}
+
+function loadLeaderboard(){
+  let list=document.getElementById("leaderboard");
+  list.innerHTML="";
+
+  let data=JSON.parse(localStorage.getItem("leaderboard")||"[]");
+
+  data.slice(-5).reverse().forEach(item=>{
+    let li=document.createElement("li");
+    li.innerText=item;
+    list.appendChild(li);
+  });
+}
+
+loadLeaderboard();
+</script>
+
+</body>
+</html>
