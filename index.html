@@ -1,183 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ultimate Sports Dashboard</title>
-
+  <title>Cricket Score Tracker</title>
   <style>
     body {
-      margin: 0;
       font-family: Arial;
-      background: #0f1111;
-      color: white;
-      display: flex;
-    }
-
-    .sidebar {
-      width: 200px;
-      background: #131921;
-      padding: 20px;
-    }
-
-    .sidebar div {
-      margin: 10px 0;
-      cursor: pointer;
-      padding: 10px;
-      border-radius: 5px;
-    }
-
-    .sidebar div:hover {
-      background: #232f3e;
-    }
-
-    .main {
-      flex: 1;
       text-align: center;
-      padding: 20px;
+      background: black;
+      color: white;
     }
-
-    .card {
-      background: #1a1a1a;
-      padding: 20px;
-      width: 400px;
-      margin: auto;
-      border-radius: 15px;
+    h1 {
+      color: red;
+      font-size: 40px;
     }
-
+    .box {
+      border: 2px solid white;
+      padding: 20px;
+      margin: 20px;
+      font-size: 22px;
+    }
     button {
-      margin: 5px;
+      font-size: 20px;
       padding: 10px;
-      background: orange;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    input {
-      padding: 5px;
       margin: 5px;
-    }
-
-    .hidden {
-      display: none;
     }
   </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <h2>Sports</h2>
-  <div onclick="showCricket()">🏏 Cricket</div>
-  <div onclick="showFootball()">⚽ Football</div>
+<h1>🏏 Cricket Score Tracker</h1>
+
+<div class="box">
+  <p>Match: India vs Australia</p>
+  <p id="score">Score: 0/0</p>
+  <p id="overs">Overs: 0</p>
 </div>
 
-<!-- MAIN -->
-<div class="main">
+<h2>Update Score</h2>
 
-  <!-- CRICKET -->
-  <div id="cricket">
-    <h1>🏏 Cricket Dashboard</h1>
-
-    <div class="card">
-      <input id="batsman" placeholder="Batsman Name">
-      <input id="bowler" placeholder="Bowler Name">
-
-      <h2 id="score">0/0 (0.0)</h2>
-
-      <button onclick="addRun(1)">+1</button>
-      <button onclick="addRun(4)">+4</button>
-      <button onclick="addRun(6)">+6</button>
-      <button onclick="wicket()">Wicket</button>
-      <button onclick="ball()">Ball</button>
-      <button onclick="resetCricket()">Reset</button>
-
-      <p id="players"></p>
-    </div>
-  </div>
-
-  <!-- FOOTBALL -->
-  <div id="football" class="hidden">
-    <h1>⚽ Football Dashboard</h1>
-
-    <div class="card">
-      <input id="teamA" placeholder="Team A">
-      <input id="teamB" placeholder="Team B">
-
-      <h2 id="fscore">0 - 0</h2>
-      <h3 id="time">0'</h3>
-
-      <button onclick="goalA()">Goal A</button>
-      <button onclick="goalB()">Goal B</button>
-      <button onclick="sub()">Substitution</button>
-      <button onclick="startTime()">Start Time</button>
-      <button onclick="resetFootball()">Reset</button>
-
-      <p id="log"></p>
-    </div>
-  </div>
-
-</div>
+<button onclick="addRun()">+1 Run</button>
+<button onclick="addWicket()">Wicket</button>
+<button onclick="addOver()">+1 Over</button>
 
 <script>
-/* CRICKET */
-let runs=0, wickets=0, balls=0;
+let runs = 0;
+let wickets = 0;
+let overs = 0;
 
-function updateCricket(){
-  let overs = Math.floor(balls/6)+"."+(balls%6);
-  document.getElementById("score").innerText = runs+"/"+wickets+" ("+overs+")";
-
-  let b = document.getElementById("batsman").value;
-  let bow = document.getElementById("bowler").value;
-  document.getElementById("players").innerText = b+" vs "+bow;
+function addRun() {
+  runs++;
+  document.getElementById("score").innerText = "Score: " + runs + "/" + wickets;
 }
 
-function addRun(x){ runs+=x; balls++; updateCricket(); }
-function wicket(){ wickets++; balls++; updateCricket(); }
-function ball(){ balls++; updateCricket(); }
-function resetCricket(){ runs=0; wickets=0; balls=0; updateCricket(); }
-
-/* FOOTBALL */
-let fa=0, fb=0, time=0, timer;
-
-function updateFootball(){
-  document.getElementById("fscore").innerText = fa+" - "+fb;
+function addWicket() {
+  wickets++;
+  document.getElementById("score").innerText = "Score: " + runs + "/" + wickets;
 }
 
-function goalA(){ fa++; updateFootball(); }
-function goalB(){ fb++; updateFootball(); }
-
-function sub(){
-  document.getElementById("log").innerText += " Substitution made |";
-}
-
-function startTime(){
-  clearInterval(timer);
-  timer = setInterval(()=>{
-    time++;
-    document.getElementById("time").innerText = time+"'";
-  },1000);
-}
-
-function resetFootball(){
-  fa=0; fb=0; time=0;
-  clearInterval(timer);
-  updateFootball();
-  document.getElementById("time").innerText="0'";
-  document.getElementById("log").innerText="";
-}
-
-/* SWITCH */
-function showCricket(){
-  document.getElementById("cricket").classList.remove("hidden");
-  document.getElementById("football").classList.add("hidden");
-}
-
-function showFootball(){
-  document.getElementById("football").classList.remove("hidden");
-  document.getElementById("cricket").classList.add("hidden");
+function addOver() {
+  overs++;
+  document.getElementById("overs").innerText = "Overs: " + overs;
 }
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
