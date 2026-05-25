@@ -1,71 +1,182 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Cricket Score Tracker</title>
-  <style>
-    body {
-      font-family: Arial;
-      text-align: center;
-      background: black;
-      color: white;
-    }
-    h1 {
-      color: red;
-      font-size: 40px;
-    }
-    .box {
-      border: 2px solid white;
-      padding: 20px;
-      margin: 20px;
-      font-size: 22px;
-    }
-    button {
-      font-size: 20px;
-      padding: 10px;
-      margin: 5px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Pro Cricket UI</title>
+
+<style>
+/* GLOBAL */
+body {
+  margin:0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: white;
+}
+
+/* HEADER */
+.header {
+  padding:15px;
+  font-size:20px;
+  text-align:center;
+  font-weight:bold;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+}
+
+/* MATCH CARD */
+.card {
+  margin:15px;
+  padding:15px;
+  border-radius:15px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(15px);
+  box-shadow:0 8px 25px rgba(0,0,0,0.4);
+}
+
+.score {
+  font-size:22px;
+  font-weight:bold;
+}
+
+.result {
+  color:#00ffcc;
+  margin-top:5px;
+}
+
+/* TABS */
+.tabs {
+  display:flex;
+  margin:10px;
+}
+
+.tab {
+  flex:1;
+  padding:12px;
+  text-align:center;
+  cursor:pointer;
+  border-radius:10px;
+  margin:3px;
+  background: rgba(255,255,255,0.1);
+  transition:0.3s;
+}
+
+.tab:hover {
+  background:#ff7b00;
+}
+
+.active {
+  background:#ff7b00;
+}
+
+/* CONTENT */
+.content {
+  margin:10px;
+  padding:15px;
+  border-radius:15px;
+  background: rgba(255,255,255,0.05);
+}
+
+/* TABLE */
+table {
+  width:100%;
+  border-collapse:collapse;
+}
+
+th, td {
+  padding:8px;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+th {
+  color:#ffcc70;
+}
+
+.player {
+  font-weight:bold;
+}
+
+/* ANIMATION */
+.fade {
+  animation: fade 0.3s ease;
+}
+
+@keyframes fade {
+  from {opacity:0;}
+  to {opacity:1;}
+}
+</style>
 </head>
 
 <body>
 
-<h1>🏏 Cricket Score Tracker</h1>
+<div class="header">🏏 PRO LIVE MATCH</div>
 
-<div class="box">
-  <p>Match: India vs Australia</p>
-  <p id="score">Score: 0/0</p>
-  <p id="overs">Overs: 0</p>
+<div class="card">
+  <div class="score">MI 224/4 (19.1)</div>
+  <div>KKR 220/4 (20)</div>
+  <div class="result">MI won by 6 wickets</div>
 </div>
 
-<h2>Update Score</h2>
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('live')">Live</div>
+  <div class="tab" onclick="switchTab('scorecard')">Scorecard</div>
+  <div class="tab" onclick="switchTab('commentary')">Commentary</div>
+  <div class="tab" onclick="switchTab('stats')">Stats</div>
+</div>
 
-<button onclick="addRun()">+1 Run</button>
-<button onclick="addWicket()">Wicket</button>
-<button onclick="addOver()">+1 Over</button>
+<div class="content fade" id="content"></div>
 
 <script>
-let runs = 0;
-let wickets = 0;
-let overs = 0;
 
-function addRun() {
-  runs++;
-  document.getElementById("score").innerText = "Score: " + runs + "/" + wickets;
+/* DATA (like backend simulation) */
+const data = {
+  live: `
+    🔴 Rohit Sharma hitting SIX!<br><br>
+    Run Rate: 11.7 🔥
+  `,
+
+  scorecard: `
+    <h3>Batting</h3>
+    <table>
+      <tr><th>Player</th><th>R</th><th>B</th><th>SR</th></tr>
+      <tr><td class="player">Rohit Sharma</td><td>78</td><td>38</td><td>205</td></tr>
+      <tr><td class="player">Rickelton</td><td>81</td><td>43</td><td>188</td></tr>
+    </table>
+
+    <h3>Bowling</h3>
+    <table>
+      <tr><th>Bowler</th><th>O</th><th>R</th><th>W</th></tr>
+      <tr><td class="player">Thakur</td><td>4</td><td>39</td><td>3</td></tr>
+      <tr><td class="player">Narine</td><td>3</td><td>30</td><td>1</td></tr>
+    </table>
+  `,
+
+  commentary: `
+    19.1 - SIX 🎉<br>
+    19.0 - FOUR 🔥<br>
+    18.5 - WICKET ❌
+  `,
+
+  stats: `
+    Run Rate: 11.7<br>
+    Top Scorer: Rohit Sharma<br>
+    Best Bowler: Thakur
+  `
+};
+
+/* SWITCH TAB */
+function switchTab(tab) {
+  document.getElementById("content").innerHTML = data[tab];
+  document.getElementById("content").classList.add("fade");
+
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  event.target.classList.add("active");
 }
 
-function addWicket() {
-  wickets++;
-  document.getElementById("score").innerText = "Score: " + runs + "/" + wickets;
-}
+/* LOAD DEFAULT */
+switchTab('live');
 
-function addOver() {
-  overs++;
-  document.getElementById("overs").innerText = "Overs: " + overs;
-}
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
