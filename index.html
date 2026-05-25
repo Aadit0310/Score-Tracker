@@ -1,169 +1,172 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Legend Sports App</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Sports Tabs Tracker</title>
 
   <style>
     body {
       margin: 0;
       font-family: Arial;
-      background: #0a0a0a;
+      background: #eaeded;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      background: #131921;
       color: white;
+      padding: 10px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .logo {
+      color: orange;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      background: #232f3e;
+    }
+
+    .tab {
+      padding: 12px;
+      color: white;
+      cursor: pointer;
+      flex: 1;
       text-align: center;
     }
 
-    h1 {
-      color: red;
-      text-shadow: 0 0 20px red;
-    }
-
-    .screen {
-      display: none;
+    .tab:hover {
+      background: #37475a;
     }
 
     .active {
-      display: block;
+      background: orange;
+      color: black;
+    }
+
+    /* CONTENT */
+    .container {
+      display: none;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .show {
+      display: flex;
     }
 
     .card {
-      margin: 20px auto;
+      background: white;
       padding: 20px;
       width: 350px;
-      border-radius: 15px;
-      background: rgba(255,255,255,0.05);
-      box-shadow: 0 0 20px red;
-    }
-
-    input, button {
-      padding: 10px;
-      margin: 5px;
       border-radius: 10px;
-      border: none;
-    }
-
-    button {
-      background: red;
-      color: white;
-      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
 
     .score {
-      font-size: 30px;
-      color: cyan;
+      font-size: 28px;
+      margin: 10px;
+      color: green;
+    }
+
+    input, button {
+      padding: 8px;
+      margin: 5px;
+    }
+
+    button {
+      background: #ffd814;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
 
 <body>
 
-<h1>🏆 LEGEND SPORTS APP</h1>
-
-<!-- LOGIN SCREEN -->
-<div id="login" class="screen active card">
-  <h2>Login</h2>
-  <input id="username" placeholder="Enter Name"><br>
-  <button onclick="login()">Enter</button>
+<div class="navbar">
+  <div class="logo">SportsHub</div>
 </div>
 
-<!-- MAIN APP -->
-<div id="app" class="screen">
-
-<div class="card">
-  <input id="teamA" placeholder="Team A">
-  <input id="teamB" placeholder="Team B">
-
-  <div class="score" id="score">0 - 0</div>
-
-  <button onclick="addA()">A +</button>
-  <button onclick="addB()">B +</button>
-  <button onclick="reset()">Reset</button>
-  <button onclick="save()">Save Match</button>
-
-  <canvas id="chart" width="300" height="200"></canvas>
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="openTab('cricket')">🏏 Cricket</div>
+  <div class="tab" onclick="openTab('football')">⚽ Football</div>
+  <div class="tab" onclick="openTab('basketball')">🏀 Basketball</div>
 </div>
 
-<div class="card">
-  <h3>🏆 Leaderboard</h3>
-  <ul id="leaderboard"></ul>
+<!-- CRICKET -->
+<div id="cricket" class="container show">
+  <div class="card">
+    <h2>Cricket</h2>
+    <div class="score" id="cScore">0 - 0</div>
+    <button onclick="cA()">Team A +</button>
+    <button onclick="cB()">Team B +</button>
+    <button onclick="cReset()">Reset</button>
+  </div>
 </div>
 
+<!-- FOOTBALL -->
+<div id="football" class="container">
+  <div class="card">
+    <h2>Football</h2>
+    <div class="score" id="fScore">0 - 0</div>
+    <button onclick="fA()">Team A +</button>
+    <button onclick="fB()">Team B +</button>
+    <button onclick="fReset()">Reset</button>
+  </div>
+</div>
+
+<!-- BASKETBALL -->
+<div id="basketball" class="container">
+  <div class="card">
+    <h2>Basketball</h2>
+    <div class="score" id="bScore">0 - 0</div>
+    <button onclick="bA()">Team A +</button>
+    <button onclick="bB()">Team B +</button>
+    <button onclick="bReset()">Reset</button>
+  </div>
 </div>
 
 <script>
-let a=0,b=0;
+// TAB SWITCH
+function openTab(tabName) {
+  let tabs = document.querySelectorAll(".container");
+  let buttons = document.querySelectorAll(".tab");
 
-function login(){
-  let user=document.getElementById("username").value;
-  if(user){
-    localStorage.setItem("user",user);
-    document.getElementById("login").classList.remove("active");
-    document.getElementById("app").classList.add("active");
-  }
+  tabs.forEach(t => t.classList.remove("show"));
+  buttons.forEach(b => b.classList.remove("active"));
+
+  document.getElementById(tabName).classList.add("show");
+  event.target.classList.add("active");
 }
 
-// Chart
-let ctx=document.getElementById("chart").getContext("2d");
-let chart=new Chart(ctx,{
-  type:"line",
-  data:{
-    labels:[],
-    datasets:[
-      {label:"A", data:[], borderColor:"red"},
-      {label:"B", data:[], borderColor:"cyan"}
-    ]
-  }
-});
+// CRICKET
+let ca=0, cb=0;
+function cUpdate(){ document.getElementById("cScore").innerText = ca+" - "+cb; }
+function cA(){ ca++; cUpdate(); }
+function cB(){ cb++; cUpdate(); }
+function cReset(){ ca=0; cb=0; cUpdate(); }
 
-function update(){
-  document.getElementById("score").innerText=a+" - "+b;
+// FOOTBALL
+let fa=0, fb=0;
+function fUpdate(){ document.getElementById("fScore").innerText = fa+" - "+fb; }
+function fA(){ fa++; fUpdate(); }
+function fB(){ fb++; fUpdate(); }
+function fReset(){ fa=0; fb=0; fUpdate(); }
 
-  chart.data.labels.push("");
-  chart.data.datasets[0].data.push(a);
-  chart.data.datasets[1].data.push(b);
-  chart.update();
-}
-
-function addA(){ a++; update(); }
-function addB(){ b++; update(); }
-
-function reset(){
-  a=0;b=0;
-  chart.data.labels=[];
-  chart.data.datasets[0].data=[];
-  chart.data.datasets[1].data=[];
-  chart.update();
-  update();
-}
-
-function save(){
-  let tA=document.getElementById("teamA").value||"A";
-  let tB=document.getElementById("teamB").value||"B";
-
-  let match=tA+" "+a+" - "+b+" "+tB;
-
-  let data=JSON.parse(localStorage.getItem("leaderboard")||"[]");
-  data.push(match);
-  localStorage.setItem("leaderboard",JSON.stringify(data));
-
-  loadLeaderboard();
-}
-
-function loadLeaderboard(){
-  let list=document.getElementById("leaderboard");
-  list.innerHTML="";
-
-  let data=JSON.parse(localStorage.getItem("leaderboard")||"[]");
-
-  data.slice(-5).reverse().forEach(item=>{
-    let li=document.createElement("li");
-    li.innerText=item;
-    list.appendChild(li);
-  });
-}
-
-loadLeaderboard();
+// BASKETBALL
+let ba=0, bb=0;
+function bUpdate(){ document.getElementById("bScore").innerText = ba+" - "+bb; }
+function bA(){ ba++; bUpdate(); }
+function bB(){ bb++; bUpdate(); }
+function bReset(){ ba=0; bb=0; bUpdate(); }
 </script>
 
 </body>
