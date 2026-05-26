@@ -1,180 +1,207 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Pro Cricket UI</title>
+<title>IPL Pro Scorer</title>
 
 <style>
-/* GLOBAL */
-body {
+body{
   margin:0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-  color: white;
+  font-family:'Segoe UI';
+  background:#0b1d2a;
+  color:white;
 }
 
 /* HEADER */
-.header {
+header{
+  background:#111;
   padding:15px;
-  font-size:20px;
   text-align:center;
-  font-weight:bold;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
-}
-
-/* MATCH CARD */
-.card {
-  margin:15px;
-  padding:15px;
-  border-radius:15px;
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(15px);
-  box-shadow:0 8px 25px rgba(0,0,0,0.4);
-}
-
-.score {
   font-size:22px;
   font-weight:bold;
 }
 
-.result {
-  color:#00ffcc;
-  margin-top:5px;
-}
-
-/* TABS */
-.tabs {
-  display:flex;
-  margin:10px;
-}
-
-.tab {
-  flex:1;
-  padding:12px;
-  text-align:center;
-  cursor:pointer;
-  border-radius:10px;
-  margin:3px;
-  background: rgba(255,255,255,0.1);
-  transition:0.3s;
-}
-
-.tab:hover {
-  background:#ff7b00;
-}
-
-.active {
-  background:#ff7b00;
-}
-
-/* CONTENT */
-.content {
-  margin:10px;
+/* MAIN */
+.container{
   padding:15px;
-  border-radius:15px;
-  background: rgba(255,255,255,0.05);
 }
 
-/* TABLE */
-table {
-  width:100%;
-  border-collapse:collapse;
+/* SCOREBAR */
+.scorebar{
+  background:#1c2b3a;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:15px;
 }
 
-th, td {
-  padding:8px;
-  border-bottom:1px solid rgba(255,255,255,0.1);
-}
-
-th {
-  color:#ffcc70;
-}
-
-.player {
+.big{
+  font-size:32px;
   font-weight:bold;
 }
 
-/* ANIMATION */
-.fade {
-  animation: fade 0.3s ease;
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
 }
 
-@keyframes fade {
-  from {opacity:0;}
-  to {opacity:1;}
+th,td{
+  padding:8px;
+  border-bottom:1px solid #333;
+  text-align:center;
+}
+
+/* BUTTON GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:15px;
+}
+
+button{
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  background:#ff9800;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#ffb300;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">🏏 PRO LIVE MATCH</div>
+<header>🏏 IPL LIVE SCORER</header>
 
-<div class="card">
-  <div class="score">MI 224/4 (19.1)</div>
-  <div>KKR 220/4 (20)</div>
-  <div class="result">MI won by 6 wickets</div>
+<div class="container">
+
+<div class="scorebar">
+  <div class="big" id="score">0/0</div>
+  <div id="overs">0.0 overs</div>
 </div>
 
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('live')">Live</div>
-  <div class="tab" onclick="switchTab('scorecard')">Scorecard</div>
-  <div class="tab" onclick="switchTab('commentary')">Commentary</div>
-  <div class="tab" onclick="switchTab('stats')">Stats</div>
+<!-- BATSMAN TABLE -->
+<h3>Batting</h3>
+<table>
+<tr><th>Name</th><th>R</th><th>B</th><th>SR</th></tr>
+<tr><td id="b1">Player 1</td><td id="r1">0</td><td id="b1b">0</td><td id="sr1">0</td></tr>
+<tr><td id="b2">Player 2</td><td id="r2">0</td><td id="b2b">0</td><td id="sr2">0</td></tr>
+</table>
+
+<!-- BOWLER -->
+<h3>Bowling</h3>
+<table>
+<tr><th>Name</th><th>O</th><th>R</th><th>W</th><th>ECO</th></tr>
+<tr><td id="bowler">Bowler</td><td id="bo">0</td><td id="br">0</td><td id="bw">0</td><td id="eco">0</td></tr>
+</table>
+
+<!-- BUTTONS -->
+<div class="grid">
+<button onclick="scoreRun(0)">0</button>
+<button onclick="scoreRun(1)">1</button>
+<button onclick="scoreRun(2)">2</button>
+<button onclick="scoreRun(3)">3</button>
+<button onclick="scoreRun(4)">4</button>
+<button onclick="scoreRun(6)">6</button>
+<button onclick="wicket()">W</button>
+<button onclick="wide()">WD</button>
 </div>
 
-<div class="content fade" id="content"></div>
+</div>
 
 <script>
 
-/* DATA (like backend simulation) */
-const data = {
-  live: `
-    🔴 Rohit Sharma hitting SIX!<br><br>
-    Run Rate: 11.7 🔥
-  `,
+let totalRuns=0, wickets=0, balls=0;
 
-  scorecard: `
-    <h3>Batting</h3>
-    <table>
-      <tr><th>Player</th><th>R</th><th>B</th><th>SR</th></tr>
-      <tr><td class="player">Rohit Sharma</td><td>78</td><td>38</td><td>205</td></tr>
-      <tr><td class="player">Rickelton</td><td>81</td><td>43</td><td>188</td></tr>
-    </table>
+// batsmen
+let striker={name:"Player 1",runs:0,balls:0};
+let nonStriker={name:"Player 2",runs:0,balls:0};
 
-    <h3>Bowling</h3>
-    <table>
-      <tr><th>Bowler</th><th>O</th><th>R</th><th>W</th></tr>
-      <tr><td class="player">Thakur</td><td>4</td><td>39</td><td>3</td></tr>
-      <tr><td class="player">Narine</td><td>3</td><td>30</td><td>1</td></tr>
-    </table>
-  `,
+// bowler
+let bowler={name:"Bowler",runs:0,wickets:0,balls:0};
 
-  commentary: `
-    19.1 - SIX 🎉<br>
-    19.0 - FOUR 🔥<br>
-    18.5 - WICKET ❌
-  `,
+function update(){
 
-  stats: `
-    Run Rate: 11.7<br>
-    Top Scorer: Rohit Sharma<br>
-    Best Bowler: Thakur
-  `
-};
+document.getElementById("score").innerText = totalRuns+"/"+wickets;
+document.getElementById("overs").innerText =
+Math.floor(balls/6)+"."+(balls%6)+" overs";
 
-/* SWITCH TAB */
-function switchTab(tab) {
-  document.getElementById("content").innerHTML = data[tab];
-  document.getElementById("content").classList.add("fade");
+// batsman
+document.getElementById("b1").innerText=striker.name+"*";
+document.getElementById("r1").innerText=striker.runs;
+document.getElementById("b1b").innerText=striker.balls;
+document.getElementById("sr1").innerText=calcSR(striker);
 
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  event.target.classList.add("active");
+document.getElementById("b2").innerText=nonStriker.name;
+document.getElementById("r2").innerText=nonStriker.runs;
+document.getElementById("b2b").innerText=nonStriker.balls;
+document.getElementById("sr2").innerText=calcSR(nonStriker);
+
+// bowler
+document.getElementById("bowler").innerText=bowler.name;
+document.getElementById("bo").innerText =
+Math.floor(bowler.balls/6)+"."+(bowler.balls%6);
+document.getElementById("br").innerText=bowler.runs;
+document.getElementById("bw").innerText=bowler.wickets;
+document.getElementById("eco").innerText=calcEco();
+
 }
 
-/* LOAD DEFAULT */
-switchTab('live');
+function calcSR(p){
+return p.balls ? ((p.runs/p.balls)*100).toFixed(1):0;
+}
+
+function calcEco(){
+let overs=bowler.balls/6;
+return overs? (bowler.runs/overs).toFixed(1):0;
+}
+
+function swap(){
+let temp=striker;
+striker=nonStriker;
+nonStriker=temp;
+}
+
+function scoreRun(r){
+
+totalRuns+=r;
+balls++;
+bowler.runs+=r;
+bowler.balls++;
+
+striker.runs+=r;
+striker.balls++;
+
+if(r%2===1) swap();
+if(balls%6===0) swap();
+
+update();
+}
+
+function wicket(){
+wickets++;
+balls++;
+bowler.wickets++;
+bowler.balls++;
+
+striker={name:"New Player "+(wickets+2),runs:0,balls:0};
+
+update();
+}
+
+function wide(){
+totalRuns++;
+bowler.runs++;
+update();
+}
+
+update();
 
 </script>
 
